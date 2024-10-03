@@ -3,6 +3,16 @@ ignore/
 #Files to be deleted, here
 
 #Files to ignore in first uploading, below
+*.png
+*.jpg
+*.jpeg
+*.file
+*.3gp
+*.gif
+*.txt
+*.pdf
+*.svg
+*.m4a
 5gyuc1e28b52496bc4f2ea9bd271ba3f4b5a0.jpeg
 5gyuc3a345c05dbc845a29e761649f36c5e5f.jpeg
 5gyuc810243b446d049988e72da0f22866405.png
