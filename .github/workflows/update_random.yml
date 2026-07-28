@@ -1,0 +1,40 @@
+name: Actualizar Enlace Aleatorio de GitHub
+
+on:
+  schedule:
+    - cron: '*/10 * * * *' # Se ejecuta cada 10 minutos (puedes ajustarlo)
+  workflow_dispatch: 
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write 
+      
+    steps:
+      - name: Checkout del código (Usando la rama principal)
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main 
+          
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Ejecutar script y obtener elemento aleatorio
+        run: node fetchRandomZoko.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }} # Obtiene automáticamente "tu-usuario/tu-repositorio"
+
+      - name: Subir cambios al repositorio
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Actualizar enlace aleatorio de GitHub
+          file_pattern: random_url.json

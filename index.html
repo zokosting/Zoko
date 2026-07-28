@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">   
+    <script>
+        fetch('random_url.json')
+            .then(response => {
+                if (!response.ok) {
+                    console.error('No se pudo cargar el archivo random_url.json');
+                    throw new Error('Carga fallida');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Establece el título de la página con el nombre del elemento
+                if (data.title) {
+                    document.title = data.title; 
+                }
+                
+                const randomUrl = data.url;
+                if (randomUrl) {
+                    // Redirección inmediata
+                    window.location.replace(randomUrl); 
+                } else {
+                    console.error('Error: URL no encontrada en el archivo.');
+                    window.location.replace('/'); 
+                }
+            })
+            .catch(error => {
+                console.error('Hubo un error al obtener la URL:', error);
+            });
+    </script>
+</head>
+<body>
+</body>
+</html>
