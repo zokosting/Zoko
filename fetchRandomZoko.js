@@ -3,8 +3,8 @@ const fs = require('fs');
 
 // --- Configuración ---
 const GITHUB_REPO = "zokosting/Zoko"; 
-// Si tiene que buscar dentro de una carpeta específica, indicarla aquí (ej. "enlaces/")
-const REPO_PATH = ""; 
+// Rama principal de tu repositorio
+const BRANCH = "main"; 
 // Token de GitHub (puedes usar el GITHUB_TOKEN nativo de las Actions)
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const OUTPUT_FILE = 'random_url.json'; 
@@ -15,8 +15,9 @@ async function fetchRandomGitHubItem() {
         process.exit(1);
     }
 
-    const apiURL = `https://api.github.com/repos/${GITHUB_REPO}/contents/${REPO_PATH}`;
-    console.log(`- Consultando contenido en el repositorio: ${GITHUB_REPO}...`);
+    // Usamos la API Git Trees para obtener la estructura completa sin límite de 1.000 elementos
+    const apiURL = `https://api.github.com/repos/${GITHUB_REPO}/git/trees/${BRANCH}?recursive=1`;
+    console.log(`- Consultando árbol de archivos en el repositorio: ${GITHUB_REPO}...`);
 
     const response = await fetch(apiURL, {
         headers: {
@@ -31,13 +32,13 @@ async function fetchRandomGitHubItem() {
         throw new Error(`Error en la API de GitHub: ${response.status} - ${errorText}`);
     }
 
-    const items = await response.json();
+    const data = await response.json();
     
-    // Filtrar: Solo archivos que terminen en .html y que NO sean index.html
-    const htmlFiles = items.filter(item => 
-        item.type === 'file' && 
-        item.name.toLowerCase().endsWith('.html') && 
-        item.name.toLowerCase() !== 'index.html'
+    // Filtrar: Solo archivos (blob) que terminen en .html y que NO sean index.html
+    const htmlFiles = data.tree.filter(item => 
+        item.type === 'blob' && 
+        item.path.toLowerCase().endsWith('.html') && 
+        item.path.toLowerCase() !== 'index.html'
     );
 
     console.log(`\nEncontrados ${htmlFiles.length} elementos válidos`);
@@ -50,22 +51,13 @@ async function fetchRandomGitHubItem() {
     const randomIndex = Math.floor(Math.random() * htmlFiles.length);
     const randomItem = htmlFiles[randomIndex];
 
-    // Construcción de la URL pública de GitHub Pages
-    const pathPrefix = REPO_PATH ? `${REPO_PATH}/` : '';
-    let targetUrl = `https://zokosting.github.io/Zoko/${pathPrefix}${randomItem.name}`;
-
-    // Opcional: Si tus archivos dentro del repo contienen URLs de texto o quieres leer el contenido de un archivo .txt/.md:
-    /*
-    if (randomItem.name.endsWith('.txt') || randomItem.name.endsWith('.md')) {
-        const contentRes = await fetch(randomItem.download_url);
-        targetUrl = (await contentRes.text()).trim();
-    }
-    */
+    // Construcción de la URL pública de GitHub Pages usando el path del archivo
+    let targetUrl = `https://zokosting.github.io/Zoko/${randomItem.path}`;
 
     // Crear el objeto JSON de salida
     const outputData = {
         url: targetUrl,
-        title: randomItem.name,
+        title: randomItem.path.split('/').pop(), // Nombre del archivo sin la ruta
         timestamp: new Date().toISOString()
     };
 
