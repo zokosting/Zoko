@@ -50,7 +50,9 @@ async function fetchRandomGitHubItem() {
     const randomIndex = Math.floor(Math.random() * htmlFiles.length);
     const randomItem = htmlFiles[randomIndex];
 
-    let targetUrl = randomItem.html_url; // Por defecto, el enlace a la página de GitHub del archivo
+    // Construcción de la URL pública de GitHub Pages
+    const pathPrefix = REPO_PATH ? `${REPO_PATH}/` : '';
+    let targetUrl = `https://zokosting.github.io/Zoko/${pathPrefix}${randomItem.name}`;
 
     // Opcional: Si tus archivos dentro del repo contienen URLs de texto o quieres leer el contenido de un archivo .txt/.md:
     /*
