@@ -33,22 +33,22 @@ async function fetchRandomGitHubItem() {
 
     const items = await response.json();
     
-// Filtrar: Solo archivos que terminen en .html y que NO sean index.html
+    // Filtrar: Solo archivos que terminen en .html y que NO sean index.html
     const htmlFiles = items.filter(item => 
         item.type === 'file' && 
         item.name.toLowerCase().endsWith('.html') && 
         item.name.toLowerCase() !== 'index.html'
     );
 
-    console.log(`\nEncontrados ${validItems.length} elementos válidos`);
+    console.log(`\nEncontrados ${htmlFiles.length} elementos válidos`);
 
-    if (validItems.length === 0) {
+    if (htmlFiles.length === 0) {
         throw new Error("No se encontraron elementos válidos en el repositorio para seleccionar.");
     }
 
     // Seleccionar uno aleatoriamente
-    const randomIndex = Math.floor(Math.random() * validItems.length);
-    const randomItem = validItems[randomIndex];
+    const randomIndex = Math.floor(Math.random() * htmlFiles.length);
+    const randomItem = htmlFiles[randomIndex];
 
     let targetUrl = randomItem.html_url; // Por defecto, el enlace a la página de GitHub del archivo
 
